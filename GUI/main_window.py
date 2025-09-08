@@ -15,6 +15,9 @@ class MainWindow(tk.Tk):
         # Área de chat
         self.chat_area = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state="disabled", height=20)
         self.chat_area.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        self.chat_area.tag_configure("server", foreground="blue", justify="center", lmargin1=100, lmargin2=100, rmargin=100)
+        self.chat_area.tag_configure("self", foreground="green", justify="right")
+        self.chat_area.tag_configure("other", foreground="black", justify="left")
 
         # Frame inferior (entrada + botón)
         bottom_frame = tk.Frame(frame)
@@ -29,13 +32,19 @@ class MainWindow(tk.Tk):
         self.send_btn.pack(side=tk.RIGHT)
 
     def _on_send(self):
-        msg = self.msg_entry.get()
-        if msg.strip():
-            self.controller.send_message(msg)  #se manda al servidor
+        msg = self.msg_entry.get().strip()
+        if msg:
+            self.controller.send_message(msg)
+            self.display_message(f"Tú: {msg}", sender="self")
             self.msg_entry.delete(0, tk.END)
 
-    def display_message(self, msg):
-        self.chat_area.config(state="normal")
-        self.chat_area.insert(tk.END, msg + "\n")
-        self.chat_area.config(state="disabled")
+
+    def display_message(self, message, sender="other"):
+        self.chat_area.configure(state="normal")
+        self.chat_area.insert(tk.END, f"{message}\n", sender)
+        self.chat_area.configure(state="disabled")
+        self.chat_area.see(tk.END)
+
+
+        self.chat_area.configure(state="disabled")
         self.chat_area.see(tk.END)
