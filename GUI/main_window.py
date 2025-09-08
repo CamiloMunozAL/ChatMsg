@@ -64,16 +64,11 @@ class MainWindow(tk.Tk):
     def display_private_message(self, from_id,message):
         if from_id not in self.private_chats:
             self.open_private_chat(from_id)
-        chat_window = self.private_chats[from_id]
-        # buscar widget de chat_area en la ventana
-        for widget in chat_window.winfo_children():
-            if isinstance(widget, scrolledtext.ScrolledText):
-                chat_area = widget
-                chat_area.configure(state="normal")
-                chat_area.insert(tk.END, f"{from_id}: {message}\n", "other")
-                chat_area.configure(state="disabled")
-                chat_area.see(tk.END)
-                break
+        chat_area = self.private_chats[from_id]['chat_area']
+        chat_area.configure(state="normal")
+        chat_area.insert(tk.END, f"{from_id}: {message}\n", "other")
+        chat_area.configure(state="disabled")
+        chat_area.see(tk.END)
 
     def update_user_list(self):
         users = self.controller.get_connected_users()
@@ -126,7 +121,7 @@ class MainWindow(tk.Tk):
             entry.delete(0, tk.END)
         send_btn = tk.Button(chat_window, text="Enviar", command=enviar)
         send_btn.pack(side=tk.RIGHT, padx=10, pady=5)
-        self.private_chats[user_id] = chat_window
+        self.private_chats[user_id] = {'window': chat_window, 'chat_area': chat_area}
 
         def on_close():
             del self.private_chats[user_id]
