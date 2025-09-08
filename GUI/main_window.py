@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import scrolledtext
 
 class MainWindow(tk.Tk):
-    def __init__(self):
+    def __init__(self, controller):
         super().__init__()
+        self.controller = controller
         self.title("ChatMsg - Global Chat")
         self.geometry("500x400")
 
@@ -30,7 +31,7 @@ class MainWindow(tk.Tk):
     def _on_send(self):
         msg = self.msg_entry.get()
         if msg.strip():
-            self.display_message(f"Tú: {msg}")
+            self.controller.send_message(msg)  #se manda al servidor
             self.msg_entry.delete(0, tk.END)
 
     def display_message(self, msg):

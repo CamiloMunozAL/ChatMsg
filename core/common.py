@@ -3,8 +3,8 @@
 Funciones de utilidad para el proyecto. y comundes
 
 """
-SERVER_IP='192.168.0.13'
-SERVER_PORT=5000
+SERVER_IP='127.0.0.1'
+SERVER_PORT=5050
 
 def send_line(sock, line):
   """Envía una línea a través del socket, asegurando que termina con un salto de línea."""
