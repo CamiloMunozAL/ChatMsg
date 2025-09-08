@@ -3,14 +3,14 @@
 # Clase que define el comportamiento del cliente en el chat distribuido
 import socket
 import threading
-from common import send_line, recv_line, SERVER_IP, SERVER_PORT
+from core.common import send_line, recv_line, SERVER_IP, SERVER_PORT
 
 class Client:
   """
   Clase que representa un cliente que se conecta al servidor de chat.
   Permite enviar y recibir mensajes, así como gestionar el nombre de usuario y la conexión.
   """
-  def __init__(self, host='localhost', port=5000):
+  def __init__(self, host=SERVER_IP, port=SERVER_PORT,on_message=None):
     """
     Inicializa el cliente con la dirección y puerto del servidor.
     """
@@ -19,6 +19,7 @@ class Client:
     self.socket = None  # Socket para la conexión
     self.running = False  # Bandera para saber si el cliente está activo
     self.username = None  # Nombre de usuario del cliente
+    self.on_message = on_message  # callback hacia GUI
 
   def connect(self):
     """
@@ -43,6 +44,8 @@ class Client:
         print('[CLIENTE] Conexión cerrada por el servidor.')
         self.running = False
         break
+      if self.on_message:
+        self.on_message(message)
       print(f'\n{message}\n> ', end='', flush=True)
 
   def send_message(self, message):
