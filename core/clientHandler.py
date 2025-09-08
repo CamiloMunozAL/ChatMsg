@@ -2,6 +2,7 @@
 # Manejador de clientes individuales desde el servidor
 import threading
 from core.common import send_line, recv_line
+import json
 
 class ClientHandler:
   """
@@ -34,7 +35,7 @@ class ClientHandler:
       send_line(self.client_socket, '[SERVIDOR] No hay identificadores disponibles. Conexión rechazada.')
       self.client_socket.close()
       return
-    send_line(self.client_socket, f'[SERVIDOR] Bienvenido! Tu identificador es {self.identifier}. Por favor, ingresa tu nombre de usuario:')
+    send_line(self.client_socket, f'[SERVIDOR] Bienvenido! Tu identificador es {self.identifier}.')
     self.username = recv_line(self.client_socket)
     if self.username is None:
       self.close()
@@ -52,8 +53,11 @@ class ClientHandler:
         break
       elif message.startswith('/users'):
         # Enviar lista de usuarios conectados
-        users = [f'{id}: {h.username}' for id, h in self.server.clients.items()]
-        send_line(self.client_socket, 'Usuarios conectados: ' + ', '.join(users))
+        users=[
+          {"id": id, "username": handler.username or ""}
+          for id, handler in self.server.clients.items()
+        ]
+        send_line(self.client_socket, "/users " + json.dumps(users))
       elif message.startswith('/priv '):
         # Mensaje privado a otro usuario
         parts = message.split(' ', 2)
@@ -64,7 +68,7 @@ class ClientHandler:
           self.server.send_private_message(self.identifier, target_id, priv_message)
       else:
         # Mensaje público al chat
-        self.server.broadcast(f'[{self.username}] {message}', exclude_handler=self)
+        self.server.broadcast(f'[{self.identifier}:{self.username}] {message}', exclude_handler=self)
     self.close()
 
   def close(self):

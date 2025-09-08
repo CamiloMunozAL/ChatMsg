@@ -3,6 +3,7 @@
 # Clase que define el comportamiento del cliente en el chat distribuido
 import socket
 import threading
+import json
 from core.common import send_line, recv_line, SERVER_IP, SERVER_PORT
 
 class Client:
@@ -20,6 +21,8 @@ class Client:
     self.running = False  # Bandera para saber si el cliente está activo
     self.username = None  # Nombre de usuario del cliente
     self.on_message = on_message  # callback hacia GUI
+    self.connected_users = []  # Lista de usuarios conectados
+    self.identifer = None  # Identificador único del cliente
 
   def connect(self):
     """
@@ -44,6 +47,23 @@ class Client:
         print('[CLIENTE] Conexión cerrada por el servidor.')
         self.running = False
         break
+
+      if message.startswith("[SERVIDOR] Bienvenido! Tu identificador es "):
+        try:
+          ident=message.split("Tu identificador es ")[1].split(".")[0]
+          self.identifier = ident
+          print(f'[CLIENTE] Mi identificador es {self.identifier}')
+        except Exception as e:
+          pass
+
+      if message.startswith("/users "):
+        try: 
+          users_json = message[len("/users "): ]
+          self.connected_users = json.loads(users_json)
+        except Exception as e:
+          print(f'[CLIENTE] Error al parsear la lista de usuarios: {e}')
+        continue
+
       if self.on_message:
         self.on_message(message)
       print(f'\n{message}\n> ', end='', flush=True)
@@ -54,6 +74,13 @@ class Client:
     """
     if self.socket:
       send_line(self.socket, message)
+
+  def send_private_message(self, user_id, message):
+    """
+    Envía un mensaje privado a otro usuario.
+    """
+    if self.socket:
+      self.send_message(f'/priv {user_id} {message}')
 
   def set_username(self, username):
     """
@@ -76,4 +103,13 @@ class Client:
     """
     self.send_message('/users')
 
-
+  def get_connected_users(self):
+      # Envía un comando especial al servidor y espera la lista
+      self.send_message("/users")
+      # Aquí deberías esperar la respuesta del servidor y devolver la lista
+      # Por simplicidad, puedes mantener una lista local actualizada con los mensajes del servidor
+      return self.connected_users
+  
+  def get_identifier(self):
+      return self.identifier
+  
