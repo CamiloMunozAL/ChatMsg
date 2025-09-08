@@ -41,7 +41,10 @@ class MainWindow(tk.Tk):
         self.send_btn.pack(side=tk.RIGHT)
 
         # Actualizar lista de usuarios cada 100 milisegundos
-        self.after(1000, self.update_user_list)
+        self.after_id=self.after(1000, self.update_user_list)
+
+        # Manejar cierre de ventana
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def _on_send(self):
         msg = self.msg_entry.get().strip()
@@ -82,7 +85,7 @@ class MainWindow(tk.Tk):
         for user in self.filtered_users:
             display_name = f"{user['id']}: {user['username']}"
             self.users_listbox.insert(tk.END, display_name)
-        self.after(1000, self.update_user_list)
+        self.after_id=self.after(1000, self.update_user_list)
 
     def _on_user_double_click(self, event):
         selection = self.users_listbox.curselection()
@@ -134,3 +137,9 @@ class MainWindow(tk.Tk):
             self.controller.send_message(msg)
             self.display_message(f"Tú: {msg}", sender="self")
             self.msg_entry.delete(0, tk.END)
+
+    def on_close(self):
+        if self.after_id:
+            self.after_cancel(self.after_id)
+        self.controller.close()
+        self.destroy()
