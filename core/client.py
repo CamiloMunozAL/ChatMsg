@@ -22,6 +22,7 @@ class Client:
     self.username = None  # Nombre de usuario del cliente
     self.on_message = on_message  # callback hacia GUI
     self.connected_users = []  # Lista de usuarios conectados
+    self.identifer = None  # Identificador único del cliente
 
   def connect(self):
     """
@@ -46,6 +47,14 @@ class Client:
         print('[CLIENTE] Conexión cerrada por el servidor.')
         self.running = False
         break
+
+      if message.startswith("[SERVIDOR] Bienvenido! Tu identificador es "):
+        try:
+          ident=message.split("Tu identificador es ")[1].split(".")[0]
+          self.identifier = ident
+          print(f'[CLIENTE] Mi identificador es {self.identifier}')
+        except Exception as e:
+          pass
 
       if message.startswith("/users "):
         try: 
@@ -100,3 +109,7 @@ class Client:
       # Aquí deberías esperar la respuesta del servidor y devolver la lista
       # Por simplicidad, puedes mantener una lista local actualizada con los mensajes del servidor
       return self.connected_users
+  
+  def get_identifier(self):
+      return self.identifier
+  

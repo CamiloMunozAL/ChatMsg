@@ -34,6 +34,8 @@ class ChatController:
                 self.gui.display_message(message, sender="other") 
         elif message.startswith("Tú:"):
             self.gui.display_message(message, sender="self")
+        elif message.startswith(f"[{self.client.get_identifier()}"):
+            print("Mensaje enviado por mí mismo, no se muestra en la GUI.")
         else:
             self.gui.display_message(message, sender="other")
 
