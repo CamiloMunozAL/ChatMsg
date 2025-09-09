@@ -172,4 +172,4 @@ Este proyecto se distribuye bajo la licencia MIT.
 
 ---
 
-**Desarrollado por [Tu Nombre o Equipo]**
+**Desarrollado por [Camilo Muñoz, Sergio Castellanos, Juan Pablo Medina]**
