@@ -12,6 +12,9 @@ class ClientHandler:
   def __init__(self, client_socket, client_address, server):
     """
     Inicializa el handler con el socket, dirección y referencia al servidor.
+    :param client_socket: Socket del cliente
+    :param client_address: Dirección (IP, puerto) del cliente
+    :param server: Referencia al servidor principal
     """
     self.client_socket = client_socket  # Socket del cliente
     self.client_address = client_address  # Dirección IP y puerto del cliente
@@ -30,11 +33,14 @@ class ClientHandler:
     """
     Maneja el ciclo principal de recepción y procesamiento de mensajes del cliente.
     """
+    # Registrar el cliente en el servidor y asignarle un identificador
     self.identifier = self.server.register_client(self)
     if not self.identifier:
       send_line(self.client_socket, '[SERVIDOR] No hay identificadores disponibles. Conexión rechazada.')
       self.client_socket.close()
       return
+    
+    # Enviar mensaje de bienvenida y pedir nombre de usuario
     send_line(self.client_socket, f'[SERVIDOR] Bienvenido! Tu identificador es {self.identifier}.')
     self.username = recv_line(self.client_socket)
     if self.username is None:
@@ -44,10 +50,12 @@ class ClientHandler:
     # Notificar a todos que un nuevo usuario se ha unido
     self.server.broadcast(f'[SERVIDOR] {self.username} se ha unido al chat.', exclude_handler=self)
 
+    # Ciclo principal de recepción de mensajes
     while self.running:
       message = recv_line(self.client_socket)
       if message is None:
         break
+      # Procesar comandos especiales
       if message.startswith('/salir'):
         self.close()
         break

@@ -12,18 +12,23 @@ def send_line(sock, line):
     line += '\n'
   sock.sendall(line.encode('utf-8'))
 
-
 def recv_line(sock):
-  # Recibir hasta saltar de línea
-  buffer =[]
-  while True:
+    """
+    Recibe datos del socket hasta encontrar un salto de línea (\n).
+    Decodifica la línea completa como UTF-8, soportando caracteres especiales.
+    """
+    buffer = bytearray()
+    while True:
+        try:
+            char = sock.recv(1)
+        except ConnectionResetError:
+            return None
+        if not char:
+            return None
+        buffer += char
+        if char == b'\n':
+            break
     try:
-      char = sock.recv(1).decode('utf-8') # aqui se recibe byte a byte
-    except ConnectionResetError:
-      return None
-    if not char:
-      return None
-    if char == '\n':
-      break
-    buffer.append(char)
-  return ''.join(buffer) # Unir la lista de caracteres en una cadena y devolverla
+        return buffer.decode('utf-8').rstrip('\r\n')
+    except UnicodeDecodeError:
+        return None
