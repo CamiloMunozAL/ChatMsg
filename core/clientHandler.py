@@ -1,7 +1,7 @@
 # clientHandler.py
 # Manejador de clientes individuales desde el servidor
 import threading
-from core.common import send_line, recv_line
+from common import send_line, recv_line
 import json
 
 class ClientHandler:

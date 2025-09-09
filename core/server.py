@@ -3,8 +3,8 @@
 # Servidor principal que gestiona los clientes y la comunicación en el chat distribuido
 import socket
 import threading
-from core.common import send_line, recv_line, SERVER_IP, SERVER_PORT
-from core.clientHandler import ClientHandler
+from common import send_line, recv_line, SERVER_IP, SERVER_PORT
+from clientHandler import ClientHandler
 
 class ChatServer:
   """

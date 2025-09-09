@@ -5,6 +5,7 @@ import socket
 import threading
 import json
 from core.common import send_line, recv_line, SERVER_IP, SERVER_PORT
+from ftp.ftp_cliente import FTPClient
 
 class Client:
   """
@@ -23,6 +24,7 @@ class Client:
     self.on_message = on_message  # callback hacia GUI
     self.connected_users = []  # Lista de usuarios conectados
     self.identifer = None  # Identificador único del cliente
+    self.ftp_client = FTPClient()  # Cliente FTP
 
   def connect(self):
     """
@@ -112,4 +114,18 @@ class Client:
   
   def get_identifier(self):
       return self.identifier
-  
+
+  def subir_archivo(self, ruta_local):
+    """
+    Sube un archivo al servidor FTP y envía el nombre del archivo al chat.
+    """
+    nombre_archivo = self.ftp_client.subir_archivo(ruta_local)
+    # Envía el nombre del archivo al chat
+    self.send_message(f"/archivo {nombre_archivo}")
+
+  def descargar_archivo(self, nombre_archivo, ruta_destino):
+    """
+    Descarga un archivo del servidor FTP.
+    """
+    self.ftp_client.descargar_archivo(nombre_archivo, ruta_destino)
+
